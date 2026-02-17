@@ -1,0 +1,283 @@
+papers:
+# =============================================================================
+# PRIMARY TIER — Directly address ViT vs CNN comparison and data efficiency
+# =============================================================================
+
+- paper_id: dosovitskiy2021vit
+  title: "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale"
+  year: 2021
+  full_text_link: https://arxiv.org/abs/2010.11929
+  journal: ICLR 2021
+  citation: Dosovitskiy et al., ICLR (2021)
+  summary: >
+    Introduces the Vision Transformer (ViT), applying a pure transformer architecture
+    to image classification. Demonstrates state-of-the-art results when pre-trained on
+    large datasets (JFT-300M), but shows ViTs underperform CNNs when trained on
+    smaller datasets due to lacking inductive biases like locality and translation equivariance.
+  type: research
+  relevance: >
+    The foundational paper establishing the data-efficiency gap between transformers
+    and CNNs — the central question of our project.
+  tier: primary
+  status: processed
+
+- paper_id: touvron2021deit
+  title: "Training Data-Efficient Image Transformers & Distillation Through Attention"
+  year: 2021
+  full_text_link: https://arxiv.org/abs/2012.12877
+  journal: ICML 2021
+  citation: Touvron et al., ICML (2021)
+  summary: >
+    Shows that ViTs can be trained competitively on ImageNet-1K alone (without
+    external data) through strong data augmentation, regularization, and a novel
+    distillation token that enables knowledge transfer from a CNN teacher.
+  type: research
+  relevance: >
+    Directly addresses the data-efficiency problem of ViTs; demonstrates that
+    training recipe matters as much as architecture for moderate-sized datasets.
+  tier: primary
+  status: processed
+
+- paper_id: steiner2022trainvit
+  title: "How to Train Your ViT? Data, Augmentation, and Regularization in Vision Transformers"
+  year: 2022
+  full_text_link: https://arxiv.org/abs/2106.10270
+  journal: Transactions on Machine Learning Research (TMLR)
+  citation: Steiner et al., TMLR (2022)
+  summary: >
+    Systematic study of how data size, augmentation, and regularization interact
+    for ViT training. Finds that the right augmentation/regularization can yield
+    gains equivalent to increasing dataset size by an order of magnitude. ViTs
+    trained on ImageNet-21k match counterparts trained on the larger JFT-300M.
+  type: research
+  relevance: >
+    Directly quantifies the data-augmentation-as-substitute-for-data-size effect,
+    central to understanding ViT performance at different dataset scales.
+  tier: primary
+  status: processed
+
+- paper_id: liu2022convnext
+  title: "A ConvNet for the 2020s"
+  year: 2022
+  full_text_link: https://arxiv.org/abs/2201.03545
+  journal: CVPR 2022
+  citation: Liu et al., CVPR (2022)
+  summary: >
+    Gradually modernizes a standard ResNet toward transformer design choices (larger
+    kernels, fewer activations, LayerNorm, etc.), producing ConvNeXt — a pure CNN
+    family that matches or exceeds Swin Transformer performance across benchmarks.
+  type: research
+  relevance: >
+    Demonstrates that the CNN-vs-transformer gap may be more about training recipes
+    and design details than fundamental architectural paradigm differences.
+  tier: primary
+  status: processed
+
+- paper_id: dascoli2021convit
+  title: "ConViT: Improving Vision Transformers with Soft Convolutional Inductive Biases"
+  year: 2021
+  full_text_link: https://arxiv.org/abs/2103.10697
+  journal: ICML 2021
+  citation: d'Ascoli et al., ICML (2021)
+  summary: >
+    Introduces gated positional self-attention (GPSA), a form of attention with a
+    'soft' convolutional inductive bias that can be learned or discarded. Outperforms
+    DeiT on ImageNet with improved sample efficiency.
+  type: research
+  relevance: >
+    Directly bridges CNN inductive biases and transformer flexibility; provides
+    empirical evidence on how inductive bias affects sample efficiency.
+  tier: primary
+  status: processed
+
+- paper_id: lu2022bridging
+  title: "Bridging the Gap Between Vision Transformers and Convolutional Neural Networks on Small Datasets"
+  year: 2022
+  full_text_link: https://arxiv.org/abs/2210.05958
+  journal: NeurIPS 2022
+  citation: Lu et al., NeurIPS (2022)
+  summary: >
+    Identifies two specific weaknesses of ViTs on small datasets — lack of spatial
+    relevance and diverse channel representation. Proposes DHVT (Dynamic Hybrid
+    Vision Transformer) which eliminates the performance gap with CNNs using a
+    lightweight model.
+  type: research
+  relevance: >
+    Most directly targets our exact research question — ViT vs CNN performance
+    on small datasets — with concrete architectural solutions.
+  tier: primary
+  status: processed
+
+- paper_id: raghu2021dovit
+  title: "Do Vision Transformers See Like Convolutional Neural Networks?"
+  year: 2021
+  full_text_link: https://arxiv.org/abs/2108.08810
+  journal: NeurIPS 2021
+  citation: Raghu et al., NeurIPS (2021)
+  summary: >
+    Analyzes internal representations of ViTs vs CNNs. Finds striking differences:
+    ViTs have more uniform representations across layers, attend to global information
+    earlier, and propagate features more strongly through residual connections.
+  type: research
+  relevance: >
+    Provides mechanistic understanding of why ViTs and CNNs differ in learned
+    representations, explaining the data-efficiency gap at a feature level.
+  tier: primary
+  status: processed
+
+- paper_id: dai2021coatnet
+  title: "CoAtNet: Marrying Convolution and Attention for All Data Sizes"
+  year: 2021
+  full_text_link: https://arxiv.org/abs/2106.04803
+  journal: NeurIPS 2021
+  citation: Dai et al., NeurIPS (2021)
+  summary: >
+    Systematically combines depthwise convolution and self-attention via relative
+    attention, stacking convolution layers and attention layers in a principled way.
+    Achieves 90.88% top-1 on ImageNet with JFT pre-training.
+  type: research
+  relevance: >
+    Explicitly designed and evaluated across different data sizes — directly
+    addresses how hybrid architectures perform from small to large data regimes.
+  tier: primary
+  status: processed
+
+- paper_id: mauricio2023survey
+  title: "Comparing Vision Transformers and Convolutional Neural Networks for Image Classification: A Literature Review"
+  year: 2023
+  full_text_link: https://doi.org/10.3390/app13095521
+  journal: Applied Sciences
+  citation: Mauricio et al., Applied Sciences (2023)
+  summary: >
+    Reviews literature from Jan 2021 to Dec 2022 comparing ViTs and CNNs for image
+    classification. Analyzes factors influencing performance including dataset size,
+    image resolution, number of classes, hardware, and architecture choice.
+  type: review
+  relevance: >
+    The most comprehensive survey directly on our topic; provides structured
+    overview of the ViT-vs-CNN comparison landscape.
+  tier: primary
+  status: processed
+
+- paper_id: xiao2021earlyconv
+  title: "Early Convolutions Help Transformers See Better"
+  year: 2021
+  full_text_link: https://arxiv.org/abs/2106.14881
+  journal: NeurIPS 2021
+  citation: Xiao et al., NeurIPS (2021)
+  summary: >
+    Shows that replacing ViT's patchify stem with a small convolutional stem
+    dramatically improves optimization stability, robustness to hyperparameters,
+    and peak performance — addressing a key weakness of pure ViTs.
+  type: research
+  relevance: >
+    Demonstrates that minimal CNN components can significantly improve ViT
+    data efficiency, relevant to hybrid architecture design for small datasets.
+  tier: primary
+  status: processed
+
+# =============================================================================
+# SECONDARY TIER — CNN foundations and supporting context
+# =============================================================================
+
+- paper_id: he2016resnet
+  title: "Deep Residual Learning for Image Recognition"
+  year: 2016
+  full_text_link: https://arxiv.org/abs/1512.03385
+  journal: CVPR 2016
+  citation: He et al., CVPR (2016)
+  summary: >
+    Introduces residual connections enabling training of networks with 100+ layers.
+    ResNet became the dominant CNN baseline architecture and remains the primary
+    CNN reference point in virtually every ViT comparison study.
+  type: research
+  relevance: >
+    The CNN baseline architecture used in most ViT comparison experiments;
+    essential context for understanding what ViTs are compared against.
+  tier: secondary
+  status: processed
+
+- paper_id: simonyan2015vggnet
+  title: "Very Deep Convolutional Networks for Large-Scale Image Recognition"
+  year: 2015
+  full_text_link: https://arxiv.org/abs/1409.1556
+  journal: ICLR 2015
+  citation: Simonyan & Zisserman, ICLR (2015)
+  summary: >
+    Establishes that network depth is a critical factor for good performance,
+    using an architecture with very small (3x3) convolution filters pushed to
+    16-19 layers. Achieved strong results on PASCAL VOC and ImageNet.
+  type: research
+  relevance: >
+    Key CNN architecture historically used on PASCAL VOC; provides baseline
+    context for CNN capabilities on the dataset we plan to use.
+  tier: secondary
+  status: processed
+
+- paper_id: tan2019efficientnet
+  title: "EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks"
+  year: 2019
+  full_text_link: https://arxiv.org/abs/1905.11946
+  journal: ICML 2019
+  citation: Tan & Le, ICML (2019)
+  summary: >
+    Proposes compound scaling — uniformly scaling depth, width, and resolution —
+    producing EfficientNet, the state-of-the-art CNN family before the ViT era.
+    Achieves better accuracy and efficiency than previous CNNs.
+  type: research
+  relevance: >
+    Represents the peak of CNN architecture design before transformers; provides
+    the strongest CNN baseline for comparison.
+  tier: secondary
+  status: processed
+
+- paper_id: liu2021swin
+  title: "Swin Transformer: Hierarchical Vision Transformer using Shifted Windows"
+  year: 2021
+  full_text_link: https://arxiv.org/abs/2103.14030
+  journal: ICCV 2021
+  citation: Liu et al., ICCV (2021)
+  summary: >
+    Introduces a hierarchical transformer with shifted window attention, achieving
+    linear computational complexity with image size. Serves as a general-purpose
+    vision backbone competitive across classification, detection, and segmentation.
+  type: research
+  relevance: >
+    Key transformer variant that incorporates CNN-like hierarchical structure
+    and locality; important comparison point between pure ViT and pure CNN.
+  tier: secondary
+  status: processed
+
+- paper_id: yuan2021t2tvit
+  title: "Tokens-to-Token ViT: Training Vision Transformers from Scratch on ImageNet"
+  year: 2021
+  full_text_link: https://arxiv.org/abs/2101.11986
+  journal: ICCV 2021
+  citation: Yuan et al., ICCV (2021)
+  summary: >
+    Proposes a tokens-to-token module that progressively tokenizes images to model
+    local structure, combined with a deep-narrow backbone. Reduces ViT parameters
+    by half while matching performance when trained from scratch on ImageNet.
+  type: research
+  relevance: >
+    Addresses training ViTs from scratch without large-scale pre-training,
+    relevant to understanding ViT behavior at moderate dataset sizes.
+  tier: secondary
+  status: processed
+
+- paper_id: kolesnikov2020bit
+  title: "Big Transfer (BiT): General Visual Representation Learning"
+  year: 2020
+  full_text_link: https://arxiv.org/abs/1912.11370
+  journal: ECCV 2020
+  citation: Kolesnikov et al., ECCV (2020)
+  summary: >
+    Scales up pre-training with a simple recipe combining group normalization,
+    weight standardization, and large batch sizes. BiT performs well across a
+    wide range of data regimes from 1 example per class to 1M total examples.
+  type: research
+  relevance: >
+    Establishes CNN transfer learning baselines across data regimes; directly
+    relevant to understanding how pre-training affects the data-size dependency.
+  tier: secondary
+  status: processed
