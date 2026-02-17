@@ -1,4 +1,5 @@
 .DS_Store
 .venv/
+__pycache__/
 literature/pdf/
 plans/*.json

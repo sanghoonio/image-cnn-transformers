@@ -11,18 +11,13 @@ This project uses [uv](https://docs.astral.sh/uv/) for Python environment and pa
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-**Create and activate the virtual environment:**
+**Set up the environment:**
 ```bash
-uv venv .venv
+uv sync
 source .venv/bin/activate
 ```
 
-**Install all project dependencies:**
-```bash
-uv sync
-```
-
-That's it. `uv sync` reads the `pyproject.toml` lockfile in the repo, creates the venv if needed, and installs exactly the right packages. When someone adds a new dependency, just pull and run `uv sync` again.
+`uv sync` reads `pyproject.toml` and `uv.lock` from the repo, creates the `.venv` if it doesn't exist, and installs exactly the right packages. When someone adds a new dependency, just pull and run `uv sync` again.
 
 **Adding new packages:**
 ```bash
@@ -34,4 +29,5 @@ This keeps dependencies tracked in the repo so everyone stays in sync. It's also
 ## Repository Structure
 
 - `literature/` — Papers, citations, and literature review report
+- `resources/` — Course materials (dataset info, project slides)
 - `plans/` — Project plans and implementation logs
