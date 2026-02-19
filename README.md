@@ -2,6 +2,8 @@
 
 DS 6050 Deep Learning project (UVA). Comparing Vision Transformer and CNN performance on image classification across varying training dataset sizes, using PASCAL VOC (~11K images, 20 classes).
 
+## Overleaf Doc
+The link to the group paper draft on Overleaf is here:  [Group 8](https://www.overleaf.com/project/6993a42d2316a7126b7f7ed5).
 ## Setup
 
 This project uses [uv](https://docs.astral.sh/uv/) for Python environment and package management. It's a fast drop-in replacement for `pip` and `venv`.
