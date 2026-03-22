@@ -81,6 +81,10 @@ def train(
     metrics_path = output_dir / "metrics.jsonl"
     best_model_path = output_dir / "best_model.pt"
 
+    # Clear stale metrics from prior runs in the same directory
+    if metrics_path.exists():
+        metrics_path.unlink()
+
     best_mAP = -1.0
     epochs_without_improvement = 0
     start_time = time.time()
