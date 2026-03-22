@@ -1,0 +1,5 @@
+model_name: vit_b16
+pretrained: false
+backbone_lr: 1.0e-3
+head_lr: 1.0e-3
+warmup_epochs: 5
