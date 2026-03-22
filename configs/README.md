@@ -27,6 +27,20 @@ The final resolved config is saved to `results/<run>/config.yaml` as the reprodu
 | `deit_s_scratch.yaml` | DeiT-S from scratch: lr=1e-3 + 5 warmup epochs |
 | `sweep.yaml` | Defines the full experiment grid (models x fractions x seeds) |
 
+## Augmentation modes
+
+The `augmentation` field selects one of three training transform pipelines (defined in `src/voc_bench/data/transforms.py`):
+
+| Mode | Transforms | Use case |
+|------|-----------|----------|
+| `none` | Resize(256), CenterCrop(224), Normalize | Baseline — no randomness, isolates architecture effect |
+| `standard` | RandomResizedCrop(224), RandomHorizontalFlip, ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0.1), Normalize | Default for all core experiments |
+| `strong` | Standard + RandAugment(num_ops=2, magnitude=9) | Augmentation ablation — tests if aggressive augmentation helps ViTs more than CNNs |
+
+Validation always uses a deterministic pipeline: Resize(256), CenterCrop(224), Normalize.
+
+All transforms use ImageNet normalization: mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225).
+
 ## Config fields
 
 ```yaml

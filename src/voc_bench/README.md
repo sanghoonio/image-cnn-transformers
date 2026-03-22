@@ -2,6 +2,8 @@
 
 Python library for the experiment pipeline. Imported by `scripts/` — not run directly.
 
+Built entirely on PyTorch. Models are loaded from `torchvision` (ResNet-50, ConvNeXt-T) and `timm` (ViT-B/16, DeiT-S) with only the final classification head replaced for 20-class multi-label output — no custom architectures. Augmentation uses `torchvision.transforms`. Metrics use `sklearn`. No custom algorithm implementations.
+
 ## Modules
 
 ### config.py
