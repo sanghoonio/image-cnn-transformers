@@ -1,6 +1,7 @@
 #!/bin/bash
 # Pre-download all pretrained model weights on the login node.
 # Compute nodes have no internet, so weights must be cached first.
+# Disables SSL verification because Rivanna's certificates are broken.
 #
 # Usage (on Rivanna login node):
 #   bash scripts/download_weights.sh
@@ -11,6 +12,9 @@ cd /home/sp5fd/image-cnn-transformers
 source .venv/bin/activate
 
 python -c "
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
+
 import torchvision.models as tv
 import timm
 
