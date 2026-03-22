@@ -5,6 +5,7 @@ __pycache__/
 literature/pdf/
 plans/*.json
 results/
+logs/
 data/VOCdevkit/
 data/*.tar
 *.pt

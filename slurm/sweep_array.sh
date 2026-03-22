@@ -1,20 +1,23 @@
 #!/bin/bash
-#SBATCH --job-name=voc-sweep
-#SBATCH --partition=gpu
+#SBATCH --job-name='voc-sweep'
+#SBATCH --partition='gpu'
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=8
-#SBATCH --mem=32G
-#SBATCH --time=02:00:00
-#SBATCH --output=logs/slurm/%A_%a.out
+#SBATCH -n 1
+#SBATCH --mem='32GB'
+#SBATCH --time=04:00:00
+#SBATCH --account='shakeri_ds6050'
+#SBATCH --output='/home/sp5fd/image-cnn-transformers/logs/slurm/%A_%a.out'
+#SBATCH --error='/home/sp5fd/image-cnn-transformers/logs/slurm/%A_%a_error.txt'
 
 # Usage: sbatch --array=0-119%20 slurm/sweep_array.sh
-# The %20 limits concurrent jobs to 20.
 
 set -euo pipefail
 
+cd /home/sp5fd/image-cnn-transformers
+
 MANIFEST=configs/generated/sweep_configs.txt
 
-# Get the config path for this array task
 CONFIG=$(sed -n "$((SLURM_ARRAY_TASK_ID + 1))p" "$MANIFEST")
 
 if [ -z "$CONFIG" ]; then
@@ -22,7 +25,6 @@ if [ -z "$CONFIG" ]; then
     exit 1
 fi
 
-# Activate environment
 source .venv/bin/activate
 
 mkdir -p logs/slurm
