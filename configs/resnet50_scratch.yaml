@@ -1,0 +1,4 @@
+model_name: resnet50
+pretrained: false
+backbone_lr: 1.0e-2
+head_lr: 1.0e-2

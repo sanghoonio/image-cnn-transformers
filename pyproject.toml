@@ -1,14 +1,21 @@
 [project]
 name = "image-cnn-transformers"
 version = "0.1.0"
-description = "Add your description here"
+description = "CNN vs Vision Transformer comparison on PASCAL VOC 2012 multi-label classification"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "fvcore>=0.1.5.post20221221",
     "matplotlib>=3.10.8",
     "numpy>=2.4.2",
+    "omegaconf>=2.3.0",
     "pandas>=3.0.0",
     "scikit-learn>=1.8.0",
+    "scikit-multilearn>=0.2.0",
+    "timm>=1.0.25",
     "torch>=2.10.0",
     "torchvision>=0.25.0",
 ]
+
+[tool.setuptools.packages.find]
+where = ["src"]

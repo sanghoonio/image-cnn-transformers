@@ -1,0 +1,28 @@
+# Base configuration -- shared defaults for all experiments
+# Per-model YAMLs override only the fields that differ.
+# CLI flags override both.
+
+# model
+model_name: resnet50
+pretrained: true
+num_classes: 20
+
+# data
+data_root: data/VOCdevkit
+fraction: 1.0
+augmentation: standard
+subset_seed: 42
+num_workers: 4
+
+# training
+backbone_lr: 1.0e-4
+head_lr: 1.0e-3
+weight_decay: 0.01
+epochs: 30
+batch_size: 64
+patience: 5
+seed: 42
+warmup_epochs: 0
+
+# output
+output_dir: results

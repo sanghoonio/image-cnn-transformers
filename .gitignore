@@ -1,5 +1,11 @@
 .DS_Store
 .venv/
 __pycache__/
+*.egg-info/
 literature/pdf/
 plans/*.json
+results/
+logs/
+data/VOCdevkit/
+data/*.tar
+*.pt

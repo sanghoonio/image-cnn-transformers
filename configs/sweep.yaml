@@ -1,0 +1,26 @@
+# Sweep configuration -- defines the experiment grid
+# Used by scripts/launch_sweep.py to generate per-run configs
+
+models:
+  - resnet50_pretrained
+  - resnet50_scratch
+  - convnext_t_pretrained
+  - convnext_t_scratch
+  - vit_b16_pretrained
+  - vit_b16_scratch
+  - deit_s_pretrained
+  - deit_s_scratch
+
+fractions:
+  - 0.05
+  - 0.10
+  - 0.20
+  - 0.50
+  - 1.00
+
+seeds:
+  - 42
+  - 123
+  - 456
+
+augmentation: standard

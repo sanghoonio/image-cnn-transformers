@@ -1,0 +1,136 @@
+\documentclass{article}
+
+% if you need to pass options to natbib, use, e.g.:
+%     \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading neurips_2024
+
+% ready for submission
+\usepackage[preprint]{neurips_2024}
+
+% to compile a preprint version, e.g., for submission to arXiv, add the
+% [preprint] option:
+%     \usepackage[preprint]{neurips_2024}
+
+% to compile a camera-ready version, add the [final] option, e.g.:
+%     \usepackage[final]{neurips_2024}
+
+% to avoid loading the natbib package, add option nonatbib:
+%    \usepackage[nonatbib]{neurips_2024}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{xcolor}         % colors
+
+
+\title{CNNs vs.\ Vision Transformers: Pretraining and Data Augmentation for Image Classification}
+
+
+\author{%
+  DS6050 Group 8 \\
+  University of Virginia \\
+  Brady Genz, Chloe Merriweather, Alyssa Samuel, Sam Park \\
+}
+
+
+\begin{document}
+
+\maketitle
+
+% \begin{abstract}
+% How do transformers compare to CNNs for image classification, and what role do pretraining and data augmentation play? We compare convolutional neural networks (CNNs) and Vision Transformers (ViTs) on the PASCAL VOC 2012 multi-label classification benchmark, varying training-set size from 5\% to 100\% of available data. We evaluate ResNet-50, ResNet-101, ViT-B/16, and DeiT-S under both training-from-scratch and ImageNet-pretrained fine-tuning regimes, measuring mean Average Precision (mAP). Our study aims to illuminate the data efficiency and scaling behavior of each architectural family on a small, realistic dataset, contributing to the understanding of when each approach is preferable in low-resource settings.
+% \end{abstract}
+
+
+\section{Motivation}
+
+How do transformers compare to CNNs for image classification? While there are many ways of comparing these model architectures, we would like to focus on the fundamentals: how do pretraining and data augmentation affect performance across these two, and why? The project will focus on comparing CNNs to vision transformers for image classification across pre-trained versus not and also consider data augmentation methods proposed in the literature.
+
+
+\section{Dataset}
+
+We are interested in evaluating training performance on smaller datasets to learn about smaller local models. As such, we are planning to use the 2012 PASCAL VOC dataset, which is a small dataset consisting of 11,500 images with 20 annotation classes.
+
+\begin{itemize}
+    \item \textbf{Kaggle:} \url{https://www.kaggle.com/datasets/bardiaardakanian/voc0712}
+    \item \textbf{Source:} \url{https://www.robots.ox.ac.uk/~vgg/projects/pascal/VOC/}
+\end{itemize}
+
+
+\section{Literature Review}
+
+Computer vision and image classification have been revolutionary in learning contextual information and automating visual tasks over the past decade. There are two major types of models to consider. The first and more established are convolutional neural networks (CNNs), which are quite ancient in the world of machine learning. They were first demonstrated to be effective for handwriting recognition in the 1990s by Yann LeCun and have since generalized into potent image models starting with AlexNet topping ImageNet 2012. How do they work at a high level? They provide MLPs with a convolutional layer that digests input data through a sliding context window, called the kernel, at every pixel. Through the kernel window, which both feeds the model only local context per pixel and also remains a constant size as it slides across input pixels, CNNs are naturally given the concepts of locality, the idea that nearby features are more related than distant ones, and also translation equivariance, the idea that the same feature located in a different area of the image is still the same feature. A key strength of CNNs is that the kernel windows overlap as they slide across the input, allowing each pixel to appear multiple times with a slightly different spatial context, allowing the model to better generalize the context of a given feature. The order of kernel windows is also preserved across each layer, allowing the model to inherently understand that the first kernel corresponds to, for example, the top left of the image, and the last kernel, the bottom right of the image.
+
+In more recent years, the introduction of transformers for natural language processing also led to the development of the vision transformer model (ViT) in 2020. These models demonstrated early on that they could exceed frontier CNNs on image classification \citep{dosovitskiy2021}. However, this phenomenon only occurred when pre-training ViTs on very large datasets containing at least 300 million images. ViTs trained from scratch on ImageNet-1K, containing around 1 million images, underperformed CNNs by a large margin. Why is this? Architecturally, transformer models are much more complex than CNNs, incorporating not a relatively simple convolutional layer before the activation layer but an entire attention block that assigns variable meaning to each input token embedding. Rather than using the idea of a sliding kernel window, ViTs tokenize and embed equally-sized nonoverlapping patches of an image as input. Critically, there is no concept of order among these patches, and so the order must be manually provided as a separate positional embedding for the model to learn order. What makes transformers require more data is that the hardcoded architectural elements of a CNN that allow it to learn spatial relationships are not present. With no overlapping sliding context window that provides inherent order and shared context across multiple patches, ViTs must learn these concepts from scratch through the attention block. Here, attention heads act as neurons and assign each input token embedding a query and key vector used to represent the token's relative importance to other tokens in the input. The query and key then inform a blended value of the token's relative importance given all other tokens, and in this single representation of ``value'', the transformer must learn order, distance, locality, translation equivariance, and spatial continuity, all while generalizing spatial context across disjoint input patches all on its own.
+
+In work that followed, researchers attempted to improve ViT performance on smaller datasets using a variety of methods, including augmenting the data, considering different optimizers, and cross-validating different learning rates \citep{touvron2021, steiner2022}. When data is scarce, Vision Transformers fail to learn local attention patterns in their early layers \citep{raghu2021}. To further test the validity of CNNs, \citet{liu2022} proposed ConvNeXt, a pure ConvNet model that can compete with modern hierarchical vision transformers, specifically the Swin Transformer \citep{liu2021}, across multiple computer vision benchmarks. The goal was to maintain the simplicity and efficiency of standard CNNs while optimizing training and using less memory. The outcomes from these studies reveal the benefits and drawbacks of using vision transformers and CNNs to perform image classification, and the need to further investigate the accuracy and efficacy of each model on a smaller dataset.
+
+The proposed experimental question and the dataset have gaps and limitations based on the existing pre-training models, the image catalog, and computation ability. The majority of the vision transformer vs.\ CNN comparison examples in the literature focus on single-label classification. The PASCAL VOC dataset is classified as a multi-label dataset because the images often contain multiple object classes. Therefore, it is uncertain whether outcomes of single-label tasks will translate to multi-label settings. Secondly, many reported results involve models pre-trained on ImageNet-21K or JFT-300M. The evaluation and pre-training distributions overlap when these models are evaluated on ImageNet-1K. For our project, we will be fine-tuning ImageNet-pre-trained models on PASCAL VOC, which has minimal overlap with ImageNet's categories.
+
+
+\section{Approach and Evaluation Plan}
+
+We will evaluate convolutional neural networks (CNNs) and Vision Transformer (ViT) models on the PASCAL VOC image classification task to compare data efficiency and scaling behavior under varying training-set sizes. PASCAL VOC contains approximately 11,000 images across 20 object categories and naturally supports multi-label classification, as images may contain multiple objects. Accordingly, we treat the task as multi-label classification, predicting the presence or absence of each of the 20 object categories independently. Performance is measured using mean Average Precision (mAP) across all classes. To study scaling trends, we vary the size of the training set while holding the evaluation split fixed, constructing subsets at 5\%, 10\%, 20\%, 50\%, and 100\% of the full training data. Subsets are sampled in a stratified manner to approximately preserve class distributions, and each configuration is trained with three independent random seeds to account for stochastic variability. Reported results include mean mAP and standard deviation across seeds.
+
+We evaluate two representative architectures from each family: ResNet-50 and ResNet-101 as convolutional baselines, and ViT-B/16 and DeiT-S as transformer-based models. All models are trained at a fixed input resolution ($224 \times 224$) with comparable data augmentation policies to ensure that performance differences reflect architectural characteristics rather than differences in input detail or regularization strength. We evaluate both training from scratch and ImageNet-pretrained fine-tuning to distinguish intrinsic data efficiency from transfer-learning benefits. Results are presented as mAP versus percentage of training data, enabling direct comparison of scaling behavior, stability, and performance ceilings across architectural families within a computationally tractable experimental design.
+
+
+% \begin{ack}
+% Add acknowledgments, funding disclosures, and competing interests here.
+% This section is automatically hidden in anonymous submission mode.
+% \end{ack}
+
+
+{\small
+
+\begin{thebibliography}{9}
+
+\bibitem[Dosovitskiy et al.(2021)]{dosovitskiy2021}
+Dosovitskiy, A., Beyer, L., Kolesnikov, A., Weissenborn, D., Zhai, X., Unterthiner, T., \ldots\ \& Houlsby, N. (2021).
+\newblock An image is worth 16x16 words: Transformers for image recognition at scale.
+\newblock \textit{ICLR 2021}.
+
+\bibitem[Liu et al.(2021)]{liu2021}
+Liu, Z., Lin, Y., Cao, Y., Hu, H., Wei, Y., Zhang, Z., \ldots\ \& Guo, B. (2021).
+\newblock Swin transformer: Hierarchical vision transformer using shifted windows.
+\newblock \textit{ICCV 2021}.
+
+\bibitem[Liu et al.(2022)]{liu2022}
+Liu, Z., Mao, H., Wu, C.~Y., Feichtenhofer, C., Darrell, T., \& Xie, S. (2022).
+\newblock A ConvNet for the 2020s.
+\newblock \textit{CVPR 2022}.
+
+\bibitem[Raghu et al.(2021)]{raghu2021}
+Raghu, M., Unterthiner, T., Kornblith, S., Zhang, C., \& Dosovitskiy, A. (2021).
+\newblock Do vision transformers see like convolutional neural networks?
+\newblock \textit{NeurIPS 2021}.
+
+\bibitem[Steiner et al.(2022)]{steiner2022}
+Steiner, A., Kolesnikov, A., Zhai, X., Wightman, R., Uszkoreit, J., \& Beyer, L. (2022).
+\newblock How to train your ViT? Data, augmentation, and regularization in vision transformers.
+\newblock \textit{Transactions on Machine Learning Research}.
+
+\bibitem[Touvron et al.(2021)]{touvron2021}
+Touvron, H., Cord, M., Douze, M., Massa, F., Sablayrolles, A., \& J\'egou, H. (2021).
+\newblock Training data-efficient image transformers \& distillation through attention.
+\newblock \textit{ICML 2021}.
+
+\end{thebibliography}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \appendix
+
+% \section{Appendix / Supplemental Material}
+
+% Add any supplemental material here (additional experiments, plots, etc.)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}

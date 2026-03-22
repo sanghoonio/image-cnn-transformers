@@ -1,0 +1,4 @@
+model_name: convnext_t
+pretrained: true
+backbone_lr: 1.0e-4
+head_lr: 1.0e-3
