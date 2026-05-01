@@ -1,0 +1,20 @@
+# Augmentation ablation sweep -- RQ2
+# Pretrained ResNet-50 + ViT-B/16 x {none, standard, strong} x 3 seeds = 18 runs
+# Used by scripts/launch_sweep.py with --output-dir configs/generated_aug
+
+models:
+  - resnet50_pretrained
+  - vit_b16_pretrained
+
+fractions:
+  - 1.00
+
+seeds:
+  - 42
+  - 123
+  - 456
+
+augmentation:
+  - none
+  - standard
+  - strong

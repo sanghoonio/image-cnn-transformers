@@ -9,3 +9,5 @@ logs/
 data/VOCdevkit/
 data/*.tar
 *.pt
+configs/generated/
+configs/generated_aug/

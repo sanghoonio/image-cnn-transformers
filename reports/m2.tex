@@ -1,0 +1,155 @@
+\documentclass{article}
+
+% if you need to pass options to natbib, use, e.g.:
+%     \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading neurips_2024
+
+% ready for submission
+\usepackage[preprint]{neurips_2024}
+
+% to compile a preprint version, e.g., for submission to arXiv, add the
+% [preprint] option:
+%     \usepackage[preprint]{neurips_2024}
+
+% to compile a camera-ready version, add the [final] option, e.g.:
+%     \usepackage[final]{neurips_2024}
+
+% to avoid loading the natbib package, add option nonatbib:
+%    \usepackage[nonatbib]{neurips_2024}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{xcolor}         % colors
+
+
+\title{CNNs vs.\ Vision Transformers: Pretraining and Data Augmentation for Multi-Label Image Classification}
+
+
+\author{%
+  DS6050 Group 8 \\
+  University of Virginia \\
+  Brady Genz, Chloe Merriweather, Alyssa Samuel, Sam Park \\
+}
+
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+We compare convolutional neural networks (CNNs) and vision transformers (ViTs) on multi-label image classification, focusing specifically on how pretraining and data augmentation shape their performance and data efficiency. Using the PASCAL VOC 2012 benchmark, which contains roughly 11,500 images annotated with 20 object categories and supports multi-label prediction, we treat the task as predicting the presence or absence of each class and evaluate models using mean Average Precision (mAP). Our study trains and evaluates two CNNs (ResNet-50, ConvNeXt-T) and two transformer-based models (ViT-B/16, DeiT-S) across both training-from-scratch and ImageNet-pretrained datasets. [Code Repository: \href{https://github.com/sanghoonio/image-cnn-transformers}{Link}]
+\end{abstract}
+
+
+\section{Introduction}
+
+Deep learning has significantly advanced image classification, with convolutional neural networks (CNNs) and Vision Transformers (ViTs) emerging as the dominant architectural paradigms. CNNs, such as ResNet, incorporate strong inductive biases like locality and translation equivariance, allowing them to learn effectively even with limited training data. In contrast, Vision Transformer models rely on self-attention mechanisms to capture global relationships across image patches, often achieving superior performance when trained on large-scale datasets. However, this advantage typically depends on extensive pretraining and large amounts of labeled data, raising important questions about their effectiveness in data-constrained environments.
+
+While prior work has extensively compared CNNs and transformers on single-label benchmarks such as ImageNet, this distinction introduces additional complexity, as models must capture both local features and contextual relationships across multiple classes simultaneously. Despite its practical importance, the behavior of CNNs and ViTs under multi-label settings, particularly with varying levels of data availability and augmentation, remains less explored. To address this gap, we evaluate these architectures on the multi-label PASCAL VOC benchmark, focusing on how pretraining and data augmentation influence performance and data efficiency across different training regimes.
+
+
+\section{Literature Survey}
+
+ViTs require large-scale pretraining to compensate for lacking the architectural elements that make CNNs data-efficient \citep{dosovitskiy2021}. Subsequent work showed that strong augmentation and distillation can partially close this gap \citep{touvron2021, steiner2022}, with \citet{steiner2022} finding that the right augmentation yields gains equivalent to a 10$\times$ dataset increase, motivating our three-tier augmentation experiment. \citet{lu2022} identified specific ViT weaknesses on small datasets, including lack of spatial relevance and poor channel diversity. On the CNN side, ConvNeXt \citep{liu2022} demonstrated that adopting transformer-era design choices within a pure convolutional framework matches Swin Transformer \citep{liu2021} performance, suggesting the gap reflects training recipes more than architecture. One thing to note is that nearly all of these comparisons use single-label benchmarks. Multi-label benchmarks evaluate performance on co-occurrence patterns between class labels, but are relatively underused in comparisons of CNN and ViT.
+
+
+\section{Method}
+
+\subsection{Models}
+
+Our study involves evaluating four architectures across two families. For CNNs, we use ResNet-50 as the baseline CNN reference using $3 \times 3$ kernels with skip connections, and ConvNeXt-T as the modernized CNN architecture that incorporates transformer-era elements such as GELU activation and a larger receptive field through $7 \times 7$ kernels. For ViTs, we use ViT-B/16 as the baseline transformer model with $16 \times 16$ non-overlapping patches and 12 transformer blocks, and DeiT-S as a smaller ViT trained with distillation from a CNN teacher. The performance of each model is evaluated under two pretraining conditions: fine-tuning from ImageNet-pretrained weights and training from scratch with random weight initialization. To allow for multi-label predictions, we replace the original SoftMax classification heads of each model with a single linear layer outputting one logit per VOC class (20 total).
+
+\subsection{Training}
+
+We use BCEWithLogitsLoss as our loss function, which uses sigmoid internally and calculates the loss with respect to ground truth labels. Weight optimization is done through AdamW with differential learning rates for the various architectures and pretraining conditions: lower rates for pretrained models to avoid drastically altering the pretrained weights ($1 \times 10^{-4}$ for CNNs, $1 \times 10^{-5}$ for ViTs to account for transformers being more sensitive to aggressive weight optimizations, and cosine annealing for both), and higher rates for models training from scratch so that they can learn faster ($1 \times 10^{-2}$ for CNNs, $1 \times 10^{-3}$ for ViTs, uniform learning rate for both). We incorporate early stopping after 5 epochs of validation mAP not improving.
+
+\subsection{Data Augmentation}
+
+We use the PASCAL VOC 2012 dataset with a training/validation split of 5,717/5,823. There are 20 object classes across all images in total, with an average of 1.46 labels per image. Class frequencies are imbalanced, ranging from 1,994 (person) to 151 (cow). To study data efficiency, we plan to construct training subsets at 5\%, 10\%, 20\%, 50\%, and 100\% of the full training set using iterative stratification to preserve class frequencies across all 20 labels. For data augmentation, we plan to test three different augmentation modalities on pretrained CNN and ViT models following the data scaling stage:
+
+\begin{enumerate}
+    \item \textbf{None:} resize and center crop only
+    \item \textbf{Standard:} random resized crop, horizontal flip, and color jitter (brightness, contrast, saturation $= 0.4$, hue $= 0.1$)
+    \item \textbf{Strong:} standard augmentation plus RandAugment (2 operations, magnitude 9)
+\end{enumerate}
+
+\subsection{Evaluation}
+
+We compute mAP separately across each of the 20 VOC classes using sklearn's \texttt{average\_precision\_score}, which compares sigmoid-transformed logits to given ground-truth labels. We then take the mean of these 20 mAP values to obtain the overall performance metric of the model. Each of the 20 VOC classes is weighted evenly in the average value.
+
+
+\section{Preliminary Experiments}
+
+As part of the preliminary deliverables for this milestone, we tested baseline model performance on the full VOC training dataset with the standard augmentation modality for ResNet-50 and ViT-B/16, on both pretrained and trained-from-scratch conditions. We evaluated performance after 30 epochs, using a batch size of 64 and an early stopping threshold of 5 epochs. As expected, pretrained models show much higher mAPs than models trained from scratch, with pretrained ViT-B/16 reaching the highest mAP of 0.9274 (\href{https://github.com/sanghoonio/image-cnn-transformers/blob/main/reports/figures/baseline_results.md}{Table~1}). Without pretraining, performance is much worse, with ViT-B/16 showing minimal learning. When looking at performance over epochs, we can see ViTs from scratch trigger early stopping at just epoch 8 reaching a mAP of 0.1659, while ResNet-50 shows continual learning throughout the allotted 30 epochs reaching a mAP of 0.3092 (\href{https://github.com/sanghoonio/image-cnn-transformers/blob/main/reports/figures/training_curves.png}{Figure~1}). Looking at the per-class mAP breakdown, we can see all models perform better on classes accounting for a larger imbalance proportion in the dataset, such as person and aeroplane, and poorly for those that are less represented in the training data (\href{https://github.com/sanghoonio/image-cnn-transformers/blob/main/reports/figures/baseline_results.md}{Table~1}). In our early testing (5\% data, pretrained, 3 epochs), we saw that per-class AP results for ViT-B/16 outperformed ResNet-50, while still reflecting better performance from both models on more-represented classes (\href{https://github.com/sanghoonio/image-cnn-transformers/blob/main/reports/figures/per_class_ap_comparison_bg.png}{Figure~2}). Future steps will include analysis of class-grouping subsets, such as texture-dependent vs.\ context-dependent classes.
+
+
+\section{Next Steps}
+
+Having confirmed the baseline performance of the CNN and ViT architectures on the full training dataset across the two training conditions, we will proceed with extending the baseline tests for ConvNeXt and DeiT-S, and evaluate our learning rate, max epochs, and patience parameters for appropriateness. We will then perform the scaling experiment on the four model architectures across pretraining conditions and five data fractions ranging from 5--100\% of the full training dataset. We will evaluate how the model architectures perform on varying input data sizes, then use pretrained models from this stage to investigate how data augmentation modalities further affect performance.
+
+
+\section{Member Contributions}
+
+The team worked together to dive deeper into the previous research on convolutional neural networks (CNNs) and vision transformers (ViTs) for the literature review. Each team member completed exploratory data analysis of the Pascal VOC dataset to investigate the object categories, and built a subset of training data and created stratified samples to train the model from scratch and fine-tuning from ImageNet weights. Collaborating as a team, initial graphs and visuals were developed to represent how the models performed.
+
+
+% \begin{ack}
+% Add acknowledgments, funding disclosures, and competing interests here.
+% This section is automatically hidden in anonymous submission mode.
+% \end{ack}
+
+
+{\small
+
+\begin{thebibliography}{9}
+
+\bibitem[Dosovitskiy et al.(2021)]{dosovitskiy2021}
+Dosovitskiy, A., Beyer, L., Kolesnikov, A., Weissenborn, D., Zhai, X., Unterthiner, T., \ldots\ \& Houlsby, N. (2021).
+\newblock An image is worth 16x16 words: Transformers for image recognition at scale.
+\newblock \textit{ICLR 2021}.
+
+\bibitem[Liu et al.(2021)]{liu2021}
+Liu, Z., Lin, Y., Cao, Y., Hu, H., Wei, Y., Zhang, Z., \ldots\ \& Guo, B. (2021).
+\newblock Swin transformer: Hierarchical vision transformer using shifted windows.
+\newblock \textit{ICCV 2021}.
+
+\bibitem[Lu et al.(2022)]{lu2022}
+Lu, Z., Xie, H., Liu, C., \& Zhang, Y. (2022).
+\newblock Bridging the gap between vision transformers and convolutional neural networks on small datasets.
+\newblock \textit{NeurIPS 2022}.
+
+\bibitem[Liu et al.(2022)]{liu2022}
+Liu, Z., Mao, H., Wu, C.~Y., Feichtenhofer, C., Darrell, T., \& Xie, S. (2022).
+\newblock A ConvNet for the 2020s.
+\newblock \textit{CVPR 2022}.
+
+\bibitem[Steiner et al.(2022)]{steiner2022}
+Steiner, A., Kolesnikov, A., Zhai, X., Wightman, R., Uszkoreit, J., \& Beyer, L. (2022).
+\newblock How to train your ViT? Data, augmentation, and regularization in vision transformers.
+\newblock \textit{Transactions on Machine Learning Research}.
+
+\bibitem[Touvron et al.(2021)]{touvron2021}
+Touvron, H., Cord, M., Douze, M., Massa, F., Sablayrolles, A., \& J\'egou, H. (2021).
+\newblock Training data-efficient image transformers \& distillation through attention.
+\newblock \textit{ICML 2021}.
+
+\end{thebibliography}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \appendix
+
+% \section{Appendix / Supplemental Material}
+
+% Add any supplemental material here (additional experiments, plots, etc.)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}

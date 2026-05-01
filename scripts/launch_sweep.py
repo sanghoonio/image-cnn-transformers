@@ -38,36 +38,46 @@ def main():
 
     config_paths = []
 
+    augmentations = sweep["augmentation"]
+    if isinstance(augmentations, str):
+        augmentations = [augmentations]
+
     for model_name in sweep["models"]:
         model_config_path = f"configs/{model_name}.yaml"
         for fraction in sweep["fractions"]:
             for seed in sweep["seeds"]:
-                overrides = {
-                    "fraction": fraction,
-                    "seed": seed,
-                    "augmentation": sweep["augmentation"],
-                }
+                for augmentation in augmentations:
+                    overrides = {
+                        "fraction": fraction,
+                        "seed": seed,
+                        "augmentation": augmentation,
+                    }
 
-                cfg = load_config(
-                    args.base_config, model_config_path, overrides=overrides
-                )
+                    cfg = load_config(
+                        args.base_config, model_config_path, overrides=overrides
+                    )
 
-                pretrain_tag = "pretrained" if cfg.pretrained else "scratch"
-                run_name = (
-                    f"{cfg.model_name}_{pretrain_tag}_"
-                    f"frac{fraction:.2f}_seed{seed}"
-                )
-                config_path = out_dir / f"{run_name}.yaml"
+                    pretrain_tag = "pretrained" if cfg.pretrained else "scratch"
+                    run_name = (
+                        f"{cfg.model_name}_{pretrain_tag}_"
+                        f"frac{fraction:.2f}_aug-{augmentation}_seed{seed}"
+                    )
+                    config_path = out_dir / f"{run_name}.yaml"
 
-                if args.dry_run:
-                    print(f"  {run_name}")
-                else:
-                    save_config(cfg, config_path)
-                    config_paths.append(str(config_path))
+                    if args.dry_run:
+                        print(f"  {run_name}")
+                    else:
+                        save_config(cfg, config_path)
+                        config_paths.append(str(config_path))
 
     if args.dry_run:
-        print(f"\n{len(sweep['models']) * len(sweep['fractions']) * len(sweep['seeds'])} "
-              f"configurations (dry run)")
+        n = (
+            len(sweep["models"])
+            * len(sweep["fractions"])
+            * len(sweep["seeds"])
+            * len(augmentations)
+        )
+        print(f"\n{n} configurations (dry run)")
         return
 
     # Write manifest file
