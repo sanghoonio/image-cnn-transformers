@@ -1,0 +1,17 @@
+model_name: deit_s
+pretrained: true
+num_classes: 20
+data_root: data/VOCdevkit
+fraction: 0.05
+augmentation: standard
+subset_seed: 42
+num_workers: 4
+backbone_lr: 1.0e-05
+head_lr: 0.001
+weight_decay: 0.01
+epochs: 30
+batch_size: 64
+patience: 5
+seed: 123
+warmup_epochs: 0
+output_dir: results

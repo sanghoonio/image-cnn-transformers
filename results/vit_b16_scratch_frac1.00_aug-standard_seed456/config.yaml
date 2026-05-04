@@ -1,0 +1,17 @@
+model_name: vit_b16
+pretrained: false
+num_classes: 20
+data_root: data/VOCdevkit
+fraction: 1.0
+augmentation: standard
+subset_seed: 42
+num_workers: 4
+backbone_lr: 0.001
+head_lr: 0.001
+weight_decay: 0.01
+epochs: 30
+batch_size: 64
+patience: 5
+seed: 456
+warmup_epochs: 5
+output_dir: results

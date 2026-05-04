@@ -1,0 +1,17 @@
+model_name: convnext_t
+pretrained: true
+num_classes: 20
+data_root: data/VOCdevkit
+fraction: 0.2
+augmentation: standard
+subset_seed: 42
+num_workers: 4
+backbone_lr: 0.0001
+head_lr: 0.001
+weight_decay: 0.01
+epochs: 30
+batch_size: 64
+patience: 5
+seed: 456
+warmup_epochs: 0
+output_dir: results
