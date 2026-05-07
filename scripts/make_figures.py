@@ -396,6 +396,72 @@ def fig_training_curves_full():
     plt.close(fig)
 
 
+def fig_training_curves_fractions():
+    """Val mAP and train loss vs epoch across all 5 data fractions, seed=42.
+
+    4 rows = architectures; 4 cols = (pretrained mAP, pretrained loss,
+    scratch mAP, scratch loss). Each subplot shows 5 fraction curves on
+    the same axes. Lines that end before epoch 30 indicate early stopping
+    fired.
+    """
+    fractions = [0.05, 0.10, 0.20, 0.50, 1.00]
+    archs = ["resnet50", "convnext_t", "vit_b16", "deit_s"]
+    # (col_idx, pretrained, metric, ylabel)
+    col_specs = [
+        (0, True, "val_mAP", "Validation mAP"),
+        (1, True, "train_loss", "Training Loss"),
+        (2, False, "val_mAP", "Validation mAP"),
+        (3, False, "train_loss", "Training Loss"),
+    ]
+
+    fig, axes = plt.subplots(4, 4, figsize=(18, 14), sharex=True)
+    cmap = plt.get_cmap("viridis")
+    frac_colors = [cmap(i / (len(fractions) - 1)) for i in range(len(fractions))]
+
+    for col_idx, pretrained, metric, ylabel in col_specs:
+        pretrain_tag = "pretrained" if pretrained else "scratch"
+        for row_idx, arch in enumerate(archs):
+            ax = axes[row_idx, col_idx]
+            for f_idx, frac in enumerate(fractions):
+                run_dir = RESULTS_DIR / (
+                    f"{arch}_{pretrain_tag}_frac{frac:.2f}_aug-standard_seed42"
+                )
+                if not run_dir.exists():
+                    continue
+                df = load_metrics(run_dir)
+                ax.plot(
+                    df["epoch"], df[metric],
+                    marker="o", markersize=3,
+                    color=frac_colors[f_idx],
+                    label=f"{int(frac * 100)}%",
+                )
+            ax.set_xlim(0, 31)
+            ax.grid(True, alpha=0.3)
+            ax.set_title(
+                f"{ARCH_LABELS[arch]} -- {pretrain_tag.capitalize()} ({ylabel.split()[-1]})",
+                fontsize=10,
+            )
+            if row_idx == 3:
+                ax.set_xlabel("Epoch")
+            if col_idx in (0, 2):
+                ax.set_ylabel(ylabel)
+            if row_idx == 0 and col_idx == 3:
+                ax.legend(
+                    loc="center left", bbox_to_anchor=(1.02, 0.5),
+                    fontsize=9, title="Train data",
+                )
+
+    fig.suptitle(
+        "Training Curves Across Data Fractions (seed=42)",
+        fontsize=13,
+    )
+    fig.tight_layout()
+    fig.savefig(FIGURES_DIR / "training_curves_fractions.png", dpi=150, bbox_inches="tight")
+    fig.savefig(FIGURES_DIR / "training_curves_fractions.pdf", bbox_inches="tight")
+    print("Saved training_curves_fractions.png/pdf")
+    plt.close(fig)
+
+
 def main():
     FIGURES_DIR.mkdir(parents=True, exist_ok=True)
     fig1_training_curves()
@@ -405,6 +471,7 @@ def main():
     fig_augmentation_ablation()
     fig_per_class_ap_full()
     fig_training_curves_full()
+    fig_training_curves_fractions()
     print(f"\nAll figures saved to {FIGURES_DIR}/")
 
 
