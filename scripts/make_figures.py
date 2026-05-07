@@ -222,7 +222,7 @@ def fig_data_scaling():
     ax.set_title("Data-Scaling: 4 Architectures x 2 Pretraining Conditions")
     ax.set_ylim(0, 1.0)
     ax.grid(True, alpha=0.3, which="both")
-    ax.legend(loc="lower right", ncol=2, fontsize=9)
+    ax.legend(loc="center left", bbox_to_anchor=(1.02, 0.5), fontsize=9)
 
     fig.tight_layout()
     fig.savefig(FIGURES_DIR / "data_scaling.png", dpi=150, bbox_inches="tight")
