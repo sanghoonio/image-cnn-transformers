@@ -77,36 +77,50 @@ def fig1_training_curves():
 
 
 def fig2_mAP_comparison():
-    """Bar chart: mAP for all 4 baselines."""
-    configs = [
-        ("resnet50_pretrained", "ResNet-50\npretrained"),
-        ("resnet50_scratch", "ResNet-50\nscratch"),
-        ("vit_b16_pretrained", "ViT-B/16\npretrained"),
-        ("vit_b16_scratch", "ViT-B/16\nscratch"),
-    ]
-    colors = ["#1f77b4", "#aec7e8", "#d62728", "#ff9896"]
+    """Grouped bar chart: mAP for all 4 architectures x 2 pretraining conditions."""
+    archs = ["resnet50", "convnext_t", "vit_b16", "deit_s"]
+    conditions = [("pretrained", True), ("scratch", False)]
 
-    mAPs = []
-    names = []
-    for run_name, label in configs:
-        run_dir = RESULTS_DIR / f"{run_name}_frac1.00_aug-standard_seed42"
-        if not run_dir.exists():
-            continue
-        eval_data = load_eval(run_dir)
-        mAPs.append(eval_data["mAP"])
-        names.append(label)
+    df = _load_summary()
+    df = df[(df["augmentation"] == "standard") & (df["fraction"] == 1.0)]
 
-    fig, ax = plt.subplots(figsize=(8, 5))
-    bars = ax.bar(names, mAPs, color=colors[:len(names)], edgecolor="black", linewidth=0.5)
+    fig, ax = plt.subplots(figsize=(9, 5))
+    x = np.arange(len(archs))
+    width = 0.38
 
-    for bar, val in zip(bars, mAPs):
-        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.01,
-                f"{val:.1%}", ha="center", va="bottom", fontweight="bold")
+    for i, (cond_label, pretrained) in enumerate(conditions):
+        means, stds = [], []
+        for arch in archs:
+            row = df[(df["model_name"] == arch) & (df["pretrained"] == pretrained)]
+            if row.empty:
+                means.append(0.0)
+                stds.append(0.0)
+            else:
+                means.append(float(row["mAP_mean"].iloc[0]))
+                stds.append(float(row["mAP_std"].iloc[0]))
+        offset = (i - 0.5) * width
+        bars = ax.bar(
+            x + offset, means, width, yerr=stds, capsize=3,
+            color=[ARCH_COLORS[a] for a in archs],
+            alpha=0.95 if pretrained else 0.55,
+            edgecolor="black", linewidth=0.5,
+            label=cond_label.capitalize(),
+        )
+        for bar, val in zip(bars, means):
+            if val > 0:
+                ax.text(
+                    bar.get_x() + bar.get_width() / 2,
+                    bar.get_height() + 0.015,
+                    f"{val:.1%}", ha="center", va="bottom", fontsize=9,
+                )
 
+    ax.set_xticks(x)
+    ax.set_xticklabels([ARCH_LABELS[a] for a in archs])
     ax.set_ylabel("mAP")
-    ax.set_title("Baseline mAP Comparison (100% data, seed=42)")
+    ax.set_title("mAP by Architecture and Pretraining (100% data, mean +/- std over 3 seeds)")
     ax.set_ylim(0, 1.05)
     ax.grid(True, alpha=0.3, axis="y")
+    ax.legend(loc="upper right")
 
     fig.tight_layout()
     fig.savefig(FIGURES_DIR / "mAP_comparison.png", dpi=150, bbox_inches="tight")
